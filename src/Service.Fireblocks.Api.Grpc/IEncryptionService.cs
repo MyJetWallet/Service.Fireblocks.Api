@@ -9,5 +9,8 @@ namespace Service.Fireblocks.Api.Grpc
     {
         [OperationContract]
         Task<EncryptionResponse> EncryptAsync(EncryptionRequest request);
+
+        [OperationContract]
+        Task<SetApiKeyResponse> SetApiKeysAsync(SetApiKeyRequest request);
     }
 }

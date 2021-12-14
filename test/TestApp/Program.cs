@@ -23,24 +23,14 @@ namespace TestApp
             var client = factory.GetVaultAccountService();
             var encryption = factory.GetEncryptionService();
 
-            //var publicKey = await File.ReadAllTextAsync(@"C:\Users\O1\Desktop\fireblocks\fireblocks_api_key");
-            //var x = await encryption.EncryptAsync(new Service.Fireblocks.Api.Grpc.Models.Encryption.EncryptionRequest
-            //{
-            //    Data = publicKey,
-            //});
-            //
-            //Console.WriteLine(x.EncryptedData);
-            //
-            //Console.WriteLine();
-            //
-            //
-            //var privateKey = await File.ReadAllTextAsync(@"C:\Users\O1\Desktop\fireblocks\fireblocks_secret.key");
-            //var x1 = await encryption.EncryptAsync(new Service.Fireblocks.Api.Grpc.Models.Encryption.EncryptionRequest
-            //{
-            //    Data = privateKey,
-            //});
-            //
-            //Console.WriteLine(x1.EncryptedData);
+            var publicKey = await File.ReadAllTextAsync(@"C:\Users\O1\Desktop\fireblocks\fireblocks_api_key");
+            var privateKey = await File.ReadAllTextAsync(@"C:\Users\O1\Desktop\fireblocks\fireblocks_secret.key");
+
+            var x = await encryption.SetApiKeysAsync(new ()
+            {
+                ApiKey = publicKey,
+                PrivateKey = privateKey 
+            });
 
             var resp = await client.GetVaultAccountAsync(new()
             {

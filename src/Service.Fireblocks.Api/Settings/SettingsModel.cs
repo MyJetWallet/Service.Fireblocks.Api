@@ -16,5 +16,8 @@ namespace Service.Fireblocks.Api.Settings
 
         [YamlProperty("FireblocksApi.BaseUrl")]
         public string FireblocksBaseUrl { get; set; }
+
+        [YamlProperty("FireblocksApi.MyNoSqlWriterUrl")]
+        public string MyNoSqlWriterUrl { get; internal set; }
     }
 }
