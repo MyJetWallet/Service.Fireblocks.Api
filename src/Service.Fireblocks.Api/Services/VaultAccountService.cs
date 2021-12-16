@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using MyJetWallet.Fireblocks.Client;
+using MyJetWallet.Fireblocks.Domain.Models.Addresses;
 using Service.Fireblocks.Api.Grpc;
 using Service.Fireblocks.Api.Grpc.Models.Addresses;
 using Service.Fireblocks.Api.Grpc.Models.VaultAccounts;
@@ -43,14 +44,14 @@ namespace Service.Fireblocks.Api.Services
 
                 return new CreateVaultAccountResponse
                 {
-                    VaultAccount = new Grpc.Models.VaultAccounts.VaultAccount
+                    VaultAccount = new MyJetWallet.Fireblocks.Domain.Models.VaultAccounts.VaultAccount
                     {
                         AutoFuel = response.Result.AutoFuel,
                         CustomerRefId = response.Result.CustomerRefId,
                         HiddenOnUI = response.Result.HiddenOnUI,
                         Id = response.Result.Id,
                         Name = response.Result.Name,
-                        VaultAssets = response.Result.Assets.Select(x => new Grpc.Models.VaultAssets.VaultAsset()
+                        VaultAssets = response.Result.Assets.Select(x => new MyJetWallet.Fireblocks.Domain.Models.VaultAssets.VaultAsset()
                         {
                             Id = x.Id,
                             Available = decimal.Parse(x.Available),
@@ -94,7 +95,7 @@ namespace Service.Fireblocks.Api.Services
 
                 return new CreateVaultAddressResponse
                 {
-                    VaultAddress = new VaultAddress
+                    VaultAddress = new MyJetWallet.Fireblocks.Domain.Models.Addresses.VaultAddress
                     {
                         Address = response.Result.Address,
                         Bip44AddressIndex = response.Result.Bip44AddressIndex,
@@ -131,7 +132,7 @@ namespace Service.Fireblocks.Api.Services
 
                 return new Grpc.Models.VaultAssets.CreateVaultAssetResponse
                 {
-                    VaultAsset = new Grpc.Models.VaultAssets.VaultAsset()
+                    VaultAsset = new MyJetWallet.Fireblocks.Domain.Models.VaultAssets.VaultAsset()
                     {
                         Id = response.Result.Id,
                     },
@@ -169,13 +170,13 @@ namespace Service.Fireblocks.Api.Services
 
                     return new GetVaultAccountResponse
                     {
-                        VaultAccount = new Grpc.Models.VaultAccounts.VaultAccount[] { new () {
+                        VaultAccount = new MyJetWallet.Fireblocks.Domain.Models.VaultAccounts.VaultAccount[] { new () {
                             AutoFuel = response.Result.AutoFuel,
                             CustomerRefId = response.Result.CustomerRefId,
                             HiddenOnUI = response.Result.HiddenOnUI,
                             Id = response.Result.Id,
                             Name = response.Result.Name,
-                            VaultAssets = response.Result.Assets.Select(x => new Grpc.Models.VaultAssets.VaultAsset()
+                            VaultAssets = response.Result.Assets.Select(x => new MyJetWallet.Fireblocks.Domain.Models.VaultAssets.VaultAsset()
                             {
                                 Id = x.Id,
                                 Available = decimal.Parse(x.Available),
@@ -198,14 +199,14 @@ namespace Service.Fireblocks.Api.Services
                     {
                         return new GetVaultAccountResponse
                         {
-                            VaultAccount = response.Result.Select(x => new Grpc.Models.VaultAccounts.VaultAccount()
+                            VaultAccount = response.Result.Select(x => new MyJetWallet.Fireblocks.Domain.Models.VaultAccounts.VaultAccount()
                             {
                                 AutoFuel = x.AutoFuel,
                                 CustomerRefId = x.CustomerRefId,
                                 HiddenOnUI = x.HiddenOnUI,
                                 Id = x.Id,
                                 Name = x.Name,
-                                VaultAssets = x.Assets.Select(x => new Grpc.Models.VaultAssets.VaultAsset()
+                                VaultAssets = x.Assets.Select(x => new MyJetWallet.Fireblocks.Domain.Models.VaultAssets.VaultAsset()
                                 {
                                     Id = x.Id,
                                     Available = decimal.Parse(x.Available),
@@ -286,7 +287,7 @@ namespace Service.Fireblocks.Api.Services
 
                 return new GetVaultAssetResponse
                 {
-                    VaultAsset = new Grpc.Models.VaultAssets.VaultAsset()
+                    VaultAsset = new MyJetWallet.Fireblocks.Domain.Models.VaultAssets.VaultAsset()
                     {
                         Id = response.Result.Id,
                         Available = decimal.Parse(response.Result.Available),

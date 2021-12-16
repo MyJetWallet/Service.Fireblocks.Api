@@ -1,3 +1,4 @@
+using MyJetWallet.Fireblocks.Domain.Models.Addresses;
 using Service.Fireblocks.Api.Grpc.Models.Common;
 using System.Runtime.Serialization;
 

@@ -1,3 +1,5 @@
+using MyJetWallet.Fireblocks.Domain.Models.Addresses;
+using MyJetWallet.Fireblocks.Domain.Models.VaultAssets;
 using Service.Fireblocks.Api.Grpc.Models.Addresses;
 using Service.Fireblocks.Api.Grpc.Models.Common;
 using Service.Fireblocks.Api.Grpc.Models.VaultAccounts;
