@@ -13,6 +13,7 @@ namespace Service.Fireblocks.Api.Modules
     {
         protected override void Load(ContainerBuilder builder)
         {
+            System.Console.WriteLine(Program.EnvSettings.GetEncryptionKey());
             var encryptionService = new SymmetricEncryptionService(Program.EnvSettings.GetEncryptionKey());
             builder.RegisterInstance(encryptionService);
 
