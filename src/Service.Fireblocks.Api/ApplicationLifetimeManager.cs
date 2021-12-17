@@ -36,10 +36,16 @@ namespace Service.Fireblocks.Api
 
             if (key != null)
             {
-                var apiKey = _symmetricEncryptionService.Decrypt(key.ApiKey);
-                var privateKey = _symmetricEncryptionService.Decrypt(key.PrivateKey);
-
-                _keyActivator.ActivateKeys(apiKey, privateKey);
+                try
+                {
+                    var apiKey = _symmetricEncryptionService.Decrypt(key.ApiKey);
+                    var privateKey = _symmetricEncryptionService.Decrypt(key.PrivateKey);
+                    _keyActivator.ActivateKeys(apiKey, privateKey);
+                }
+                catch (System.Exception e)
+                {
+                    _logger.LogError(e, "PLS< SET UP KEYS FOR API");
+                }
             }
         }
 
