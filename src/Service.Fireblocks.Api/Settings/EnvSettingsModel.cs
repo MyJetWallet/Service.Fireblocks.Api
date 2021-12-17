@@ -9,7 +9,7 @@ namespace Service.Fireblocks.Api.Settings
 
         public string GetEncryptionKey()
         {
-            return ENCRYPTION_KEY.Trim();
+            return Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(ENCRYPTION_KEY.Trim()));
         }
 
     }
