@@ -6,6 +6,8 @@ using Service.Fireblocks.Api.Services;
 using System.IO;
 using MyJetWallet.Sdk.NoSql;
 using Service.Fireblocks.Api.NoSql;
+using MyJetWallet.Fireblocks.Client.DelegateHandlers;
+using Microsoft.Extensions.Logging;
 
 namespace Service.Fireblocks.Api.Modules
 {
@@ -13,6 +15,7 @@ namespace Service.Fireblocks.Api.Modules
     {
         protected override void Load(ContainerBuilder builder)
         {
+            var logger = Program.LogFactory.CreateLogger<LoggerMiddleware>();
             var encryptionService = new SymmetricEncryptionService(Program.EnvSettings.GetEncryptionKey());
             builder.RegisterInstance(encryptionService);
 
@@ -21,7 +24,7 @@ namespace Service.Fireblocks.Api.Modules
                 //ApiKey = ,
                 //ApiPrivateKey = ,
                 BaseUrl = Program.Settings.FireblocksBaseUrl,
-            });
+            }, new LoggerMiddleware(logger));
 
             builder.RegisterMyNoSqlWriter<FireblocksApiKeysNoSql>(() => Program.Settings.MyNoSqlWriterUrl, FireblocksApiKeysNoSql.TableName);
         }
