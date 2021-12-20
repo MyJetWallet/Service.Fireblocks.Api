@@ -41,7 +41,7 @@ namespace Service.Fireblocks.Api.Services
                 {
                     AutoFuel = request.AutoFuel,
                     CustomerRefId = request.CustomerRefId,
-                    Name = request.Name,
+                    Name = GetWithClientPrefix(request.Name),
                     HiddenOnUI = request.HiddenOnUI,
                 });
 
@@ -95,7 +95,7 @@ namespace Service.Fireblocks.Api.Services
                     new Body6
                     {
                         CustomerRefId = request.CustomerRefId,
-                        Description = request.Name,
+                        Description = GetWithClientPrefix(request.Name),
                     });
 
                 return new CreateVaultAddressResponse
@@ -320,6 +320,12 @@ namespace Service.Fireblocks.Api.Services
                 };
             }
         }
+
+        public static string GetWithClientPrefix(string clientId)
+        {
+            return $"client_{clientId}";
+        }
+
         public async Task<Grpc.Models.Addresses.ValidateAddressResponse> ValidateAddressAsync(ValidateAddressRequest request)
         {
             try
