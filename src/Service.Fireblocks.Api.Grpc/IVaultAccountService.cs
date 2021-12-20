@@ -26,5 +26,8 @@ namespace Service.Fireblocks.Api.Grpc
 
         [OperationContract]
         Task<GetVaultAddressResponse> GetVaultAddressAsync(GetVaultAddressRequest request);
+
+        [OperationContract]
+        Task<ValidateAddressResponse> ValidateAddressAsync(ValidateAddressRequest request);
     }
 }

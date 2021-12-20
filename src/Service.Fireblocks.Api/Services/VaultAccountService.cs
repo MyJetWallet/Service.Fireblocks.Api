@@ -18,27 +18,30 @@ namespace Service.Fireblocks.Api.Services
         private readonly IVaultClient _vaultClient;
         private readonly IClient _client;
         private readonly IAccountsClient _accountsClient;
+        private readonly ITransactionsClient _transactionsClient;
 
         public VaultAccountService(ILogger<VaultAccountService> logger,
             IVaultClient vaultClient,
             IClient client,
-            IAccountsClient accountsClient)
+            IAccountsClient accountsClient,
+            ITransactionsClient transactionsClient)
         {
             _logger = logger;
             this._vaultClient = vaultClient;
             this._client = client;
             this._accountsClient = accountsClient;
+            this._transactionsClient = transactionsClient;
         }
 
         public async Task<CreateVaultAccountResponse> CreateVaultAccountAsync(CreateVaultAccountRequest request)
         {
             try
             {
-                var response = await _vaultClient.AccountsPostAsync(new Body
+                var response = await _vaultClient.AccountsPostAsync($"create_vault_account_{request.Name}", new Body
                 {
                     AutoFuel = request.AutoFuel,
                     CustomerRefId = request.CustomerRefId,
-                    Name = AddPrefixToValutAccountName(request.Name),
+                    Name = GetWithClientPrefix(request.Name),
                     HiddenOnUI = request.HiddenOnUI,
                 });
 
@@ -86,11 +89,13 @@ namespace Service.Fireblocks.Api.Services
         {
             try
             {
-                var response = await _accountsClient.AddressesPostAsync(request.VaultAccountId, request.AssetId,
+                var response = await _accountsClient.AddressesPostAsync($"create_vault_address_{request.Name}",
+                    request.VaultAccountId, 
+                    request.AssetId,
                     new Body6
                     {
                         CustomerRefId = request.CustomerRefId,
-                        Description = AddPrefixToValutAccountName(request.Name),
+                        Description = GetWithClientPrefix(request.Name),
                     });
 
                 return new CreateVaultAddressResponse
@@ -316,10 +321,36 @@ namespace Service.Fireblocks.Api.Services
             }
         }
 
-        private static string AddPrefixToValutAccountName(string name)
+        public static string GetWithClientPrefix(string clientId)
         {
-            return "client" + name;
+            return $"client_{clientId}";
         }
 
+        public async Task<Grpc.Models.Addresses.ValidateAddressResponse> ValidateAddressAsync(ValidateAddressRequest request)
+        {
+            try
+            {
+                var response = await _transactionsClient.Validate_addressAsync(request.AssetId, request.Address);
+
+                return new Grpc.Models.Addresses.ValidateAddressResponse
+                {
+                    Address = request.Address,
+                    IsValid = response.Result.IsValid,
+                };
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Error validating address @{context}", request);
+
+                return new Grpc.Models.Addresses.ValidateAddressResponse
+                {
+                    Error = new Grpc.Models.Common.ErrorResponse
+                    {
+                        ErrorCode = Grpc.Models.Common.ErrorCode.Unknown,
+                        Message = e.Message
+                    }
+                };
+            }
+        }
     }
 }
