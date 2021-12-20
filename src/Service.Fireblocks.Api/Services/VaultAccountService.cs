@@ -129,7 +129,7 @@ namespace Service.Fireblocks.Api.Services
         {
             try
             {
-                var response = await _vaultClient.AccountsPostAsync(request.VaultAccountId, request.AsssetId,
+                var response = await _vaultClient.AccountsPostAsync($"create_vault_asset_{request.VaultAccountId}_{request.AsssetId}", request.VaultAccountId, request.AsssetId,
                     new Body5
                     {
                         EosAccountName = request.EosAccountName
