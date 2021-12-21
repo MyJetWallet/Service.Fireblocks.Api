@@ -37,7 +37,9 @@ namespace Service.Fireblocks.Api.Services
         {
             try
             {
-                var response = await _vaultClient.AccountsPostAsync($"create_vault_account_{request.Name}", new Body
+                var idempotencyKey = $"account_{request.Name}";
+                idempotencyKey = idempotencyKey.Substring(0, Math.Min(40, idempotencyKey.Length));
+                var response = await _vaultClient.AccountsPostAsync(idempotencyKey, new Body
                 {
                     AutoFuel = request.AutoFuel,
                     CustomerRefId = request.CustomerRefId,
@@ -89,7 +91,9 @@ namespace Service.Fireblocks.Api.Services
         {
             try
             {
-                var response = await _accountsClient.AddressesPostAsync($"create_vault_address_{request.Name}",
+                var idempotencyKey = $"addr_{request.Name}";
+                idempotencyKey = idempotencyKey.Substring(0, Math.Min(40, idempotencyKey.Length));
+                var response = await _accountsClient.AddressesPostAsync(idempotencyKey,
                     request.VaultAccountId, 
                     request.AssetId,
                     new Body6
@@ -129,7 +133,9 @@ namespace Service.Fireblocks.Api.Services
         {
             try
             {
-                var response = await _vaultClient.AccountsPostAsync($"create_vault_asset_{request.VaultAccountId}_{request.AsssetId}", request.VaultAccountId, request.AsssetId,
+                var idempotencyKey = $"wallet_{request.VaultAccountId}_{request.AsssetId}";
+                idempotencyKey = idempotencyKey.Substring(0, Math.Min(40, idempotencyKey.Length));
+                var response = await _vaultClient.AccountsPostAsync(idempotencyKey, request.VaultAccountId, request.AsssetId,
                     new Body5
                     {
                         EosAccountName = request.EosAccountName
