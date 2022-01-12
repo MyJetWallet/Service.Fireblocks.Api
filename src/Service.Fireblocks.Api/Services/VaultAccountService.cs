@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using MyJetWallet.Fireblocks.Client;
 using MyJetWallet.Fireblocks.Domain.Models.Addresses;
+using MyJetWallet.Sdk.Service;
 using Service.Fireblocks.Api.Grpc;
 using Service.Fireblocks.Api.Grpc.Models.Addresses;
 using Service.Fireblocks.Api.Grpc.Models.VaultAccounts;
@@ -74,7 +75,7 @@ namespace Service.Fireblocks.Api.Services
             }
             catch (Exception e)
             {
-                _logger.LogError(e, "Error creating VaultAccount @{context}", request);
+                _logger.LogError(e, "Error creating VaultAccount {context}", request.ToJson());
 
                 return new CreateVaultAccountResponse
                 {
@@ -116,7 +117,7 @@ namespace Service.Fireblocks.Api.Services
             }
             catch (Exception e)
             {
-                _logger.LogError(e, "Error creating VaultAddress @{context}", request);
+                _logger.LogError(e, "Error creating VaultAddress {context}", request.ToJson());
 
                 return new CreateVaultAddressResponse
                 {
@@ -158,7 +159,7 @@ namespace Service.Fireblocks.Api.Services
             }
             catch (Exception e)
             {
-                _logger.LogError(e, "Error creating VaultAddress @{context}", request);
+                _logger.LogError(e, "Error creating VaultAddress {context}", request.ToJson());
 
                 return new Grpc.Models.VaultAssets.CreateVaultAssetResponse
                 {
@@ -244,7 +245,7 @@ namespace Service.Fireblocks.Api.Services
             }
             catch (Exception e)
             {
-                _logger.LogError(e, "Error creating VaultAddress @{context}", request);
+                _logger.LogError(e, "Error creating VaultAddress {context}", request.ToJson());
 
                 return new GetVaultAccountResponse
                 {
@@ -277,7 +278,7 @@ namespace Service.Fireblocks.Api.Services
             }
             catch (Exception e)
             {
-                _logger.LogError(e, "Error creating VaultAddress @{context}", request);
+                _logger.LogError(e, "Error creating VaultAddress {context}", request.ToJson());
 
                 return new GetVaultAddressResponse
                 {
@@ -346,7 +347,7 @@ namespace Service.Fireblocks.Api.Services
             }
             catch (Exception e)
             {
-                _logger.LogError(e, "Error validating address @{context}", request);
+                _logger.LogError(e, "Error validating address @{context}", request.ToJson());
 
                 return new Grpc.Models.Addresses.ValidateAddressResponse
                 {
