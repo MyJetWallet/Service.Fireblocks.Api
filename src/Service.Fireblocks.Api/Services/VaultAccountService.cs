@@ -95,7 +95,7 @@ namespace Service.Fireblocks.Api.Services
                 var idempotencyKey = $"addr_{request.Name}";
                 idempotencyKey = idempotencyKey.Substring(0, Math.Min(40, idempotencyKey.Length));
                 var response = await _accountsClient.AddressesPostAsync(idempotencyKey,
-                    request.VaultAccountId, 
+                    request.VaultAccountId,
                     request.AssetId,
                     new Body6
                     {
@@ -188,18 +188,27 @@ namespace Service.Fireblocks.Api.Services
                             HiddenOnUI = response.Result.HiddenOnUI,
                             Id = response.Result.Id,
                             Name = response.Result.Name,
-                            VaultAssets = response.Result.Assets.Select(x => new MyJetWallet.Fireblocks.Domain.Models.VaultAssets.VaultAsset()
-                            {
-                                Id = x.Id,
-                                Available = decimal.Parse(x.Available),
-                                BlockHash = x.BlockHash,
-                                BlockHeight = x.BlockHeight,
-                                Frozen = decimal.Parse(x.Frozen),
-                                LockedAmount = decimal.Parse(x.LockedAmount),
-                                Pending = decimal.Parse(x.Pending),
-                                Staked = decimal.Parse(x.Staked),
-                                Total = decimal.Parse(x.Total)
-                            }).ToArray()
+                            VaultAssets = response.Result.Assets.Select(x => {
+
+                                decimal.TryParse(x.Available, out var available);
+                                decimal.TryParse(x.Frozen, out var frozen);
+                                decimal.TryParse(x.LockedAmount, out var lockedAmount);
+                                decimal.TryParse(x.Pending, out var pending);
+                                decimal.TryParse(x.Staked, out var staked);
+                                decimal.TryParse(x.Total, out var total);
+
+                                return new MyJetWallet.Fireblocks.Domain.Models.VaultAssets.VaultAsset()
+                                {
+                                    Id = x.Id,
+                                    BlockHash = x.BlockHash,
+                                    BlockHeight = x.BlockHeight,
+                                    Available = available,
+                                    Frozen = frozen,
+                                    LockedAmount = lockedAmount,
+                                    Pending = pending,
+                                    Staked = staked,
+                                    Total = total
+                                };}).ToArray()
                         } },
                     };
                 }
@@ -218,17 +227,27 @@ namespace Service.Fireblocks.Api.Services
                                 HiddenOnUI = x.HiddenOnUI,
                                 Id = x.Id,
                                 Name = x.Name,
-                                VaultAssets = x.Assets.Select(x => new MyJetWallet.Fireblocks.Domain.Models.VaultAssets.VaultAsset()
+                                VaultAssets = x.Assets.Select(x =>
                                 {
-                                    Id = x.Id,
-                                    Available = decimal.Parse(x.Available),
-                                    BlockHash = x.BlockHash,
-                                    BlockHeight = x.BlockHeight,
-                                    Frozen = decimal.Parse(x.Frozen),
-                                    LockedAmount = decimal.Parse(x.LockedAmount),
-                                    Pending = decimal.Parse(x.Pending),
-                                    Staked = decimal.Parse(x.Staked),
-                                    Total = decimal.Parse(x.Total)
+                                    decimal.TryParse(x.Available, out var available);
+                                    decimal.TryParse(x.Frozen, out var frozen);
+                                    decimal.TryParse(x.LockedAmount, out var lockedAmount);
+                                    decimal.TryParse(x.Pending, out var pending);
+                                    decimal.TryParse(x.Staked, out var staked);
+                                    decimal.TryParse(x.Total, out var total);
+
+                                    return new MyJetWallet.Fireblocks.Domain.Models.VaultAssets.VaultAsset()
+                                    {
+                                        Id = x.Id,
+                                        Available = available,
+                                        BlockHash = x.BlockHash,
+                                        BlockHeight = x.BlockHeight,
+                                        Frozen = frozen,
+                                        LockedAmount = lockedAmount,
+                                        Pending = pending,
+                                        Staked = staked,
+                                        Total = total
+                                    };
                                 }).ToArray()
                             }).ToArray(),
                         };
