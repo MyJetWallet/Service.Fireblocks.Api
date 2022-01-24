@@ -1,11 +1,8 @@
-﻿using System;
-using System.IO;
-using System.Linq;
-using System.Text.Unicode;
-using System.Threading.Tasks;
+﻿using MyJetWallet.Sdk.Service;
 using ProtoBuf.Grpc.Client;
 using Service.Fireblocks.Api.Client;
-using Service.Fireblocks.Api.Grpc.Models;
+using System;
+using System.Threading.Tasks;
 
 namespace TestApp
 {
@@ -21,22 +18,33 @@ namespace TestApp
 
             var factory = new FireblocksApiClientFactory("http://localhost:5001");
             var client = factory.GetVaultAccountService();
-            var encryption = factory.GetEncryptionService();
+            //var encryption = factory.GetEncryptionService();
 
-            var publicKey = await File.ReadAllTextAsync(@"C:\Users\O1\Desktop\fireblocks\fireblocks_api_key");
-            var privateKey = await File.ReadAllTextAsync(@"C:\Users\O1\Desktop\fireblocks\fireblocks_secret.key");
+            //var publicKey = await File.ReadAllTextAsync(@"C:\Users\O1\Desktop\fireblocks\fireblocks_api_key");
+            //var privateKey = await File.ReadAllTextAsync(@"C:\Users\O1\Desktop\fireblocks\fireblocks_secret.key");
 
-            var x = await encryption.SetApiKeysAsync(new ()
+            //var x = await encryption.SetApiKeysAsync(new ()
+            //{
+            //    ApiKey = publicKey,
+            //    PrivateKey = privateKey 
+            //});
+
+
+            var stream = client.GetBalancesForAssetAsync(new()
             {
-                ApiKey = publicKey,
-                PrivateKey = privateKey 
+                FireblocksAssetId = "ETH_TEST",
+                NamePrefix = "client_",
+                Threshold = 0.01m,
+                BatchSize = 1
             });
 
-            var resp = await client.GetVaultAccountAsync(new()
+            var count = 0;
+            await foreach (var item in stream)
             {
-                VaultAccountId = "11"
-            });
-            Console.WriteLine(resp?.VaultAccount?.FirstOrDefault().Id);
+                Console.WriteLine(count);
+                Console.WriteLine(item?.ToJson());
+                count++;
+            }
 
             Console.WriteLine("End");
             Console.ReadLine();

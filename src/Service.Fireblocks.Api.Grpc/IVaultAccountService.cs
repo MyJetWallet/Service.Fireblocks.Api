@@ -1,6 +1,8 @@
+using System.Collections.Generic;
 using System.ServiceModel;
 using System.Threading.Tasks;
 using Service.Fireblocks.Api.Grpc.Models.Addresses;
+using Service.Fireblocks.Api.Grpc.Models.Balances;
 using Service.Fireblocks.Api.Grpc.Models.VaultAccounts;
 using Service.Fireblocks.Api.Grpc.Models.VaultAssets;
 
@@ -29,5 +31,8 @@ namespace Service.Fireblocks.Api.Grpc
 
         [OperationContract]
         Task<ValidateAddressResponse> ValidateAddressAsync(ValidateAddressRequest request);
+
+        [OperationContract]
+        IAsyncEnumerable<GetVaultAccountBalancesResponse> GetBalancesForAssetAsync(GetVaultAccountBalancesRequest request);
     }
 }

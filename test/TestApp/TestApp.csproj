@@ -13,6 +13,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\src\Service.Fireblocks.Api.Client\Service.Fireblocks.Api.Client.csproj" />
     <ProjectReference Include="..\..\src\Service.Fireblocks.Api.Grpc\Service.Fireblocks.Api.Grpc.csproj" />
+    <ProjectReference Include="..\..\src\Service.Fireblocks.Api\Service.Fireblocks.Api.csproj" />
   </ItemGroup>
 
 </Project>

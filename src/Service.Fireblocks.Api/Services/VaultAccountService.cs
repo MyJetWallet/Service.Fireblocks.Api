@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
@@ -7,6 +8,7 @@ using MyJetWallet.Fireblocks.Domain.Models.Addresses;
 using MyJetWallet.Sdk.Service;
 using Service.Fireblocks.Api.Grpc;
 using Service.Fireblocks.Api.Grpc.Models.Addresses;
+using Service.Fireblocks.Api.Grpc.Models.Balances;
 using Service.Fireblocks.Api.Grpc.Models.VaultAccounts;
 using Service.Fireblocks.Api.Grpc.Models.VaultAssets;
 using Service.Fireblocks.Api.Settings;
@@ -376,6 +378,126 @@ namespace Service.Fireblocks.Api.Services
                         Message = e.Message
                     }
                 };
+            }
+        }
+
+        public async IAsyncEnumerable<GetVaultAccountBalancesResponse> GetBalancesForAssetAsync(GetVaultAccountBalancesRequest request)
+        {
+            bool isError = false;
+            Response<List<VaultAccount>> response = null;
+            var context = request.ToJson();
+            try
+            {
+                response = await _vaultClient.AccountsGetAsync(
+                    namePrefix: request.NamePrefix,
+                    minAmountThreshold: request.Threshold.ToString(),
+                    assetId: request.FireblocksAssetId);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Error GetBalancesForAssetAsync {context}", context);
+                isError = true;
+            }
+
+            if (isError)
+            {
+                yield return new GetVaultAccountBalancesResponse()
+                {
+                    Error = new Grpc.Models.Common.ErrorResponse
+                    {
+                        ErrorCode = Grpc.Models.Common.ErrorCode.DoesNotExist,
+                    }
+                };
+            }
+
+            var batchSize =request.BatchSize > 0 && request.BatchSize < 1000 ? request.BatchSize : 100;
+
+            if (response.Result.Any())
+            {
+                var vaultAccounts = response.Result.Select(x => new MyJetWallet.Fireblocks.Domain.Models.VaultAccounts.VaultAccount()
+                {
+                    AutoFuel = x.AutoFuel,
+                    CustomerRefId = x.CustomerRefId,
+                    HiddenOnUI = x.HiddenOnUI,
+                    Id = x.Id,
+                    Name = x.Name,
+                    VaultAssets = x.Assets.Select(x =>
+                    {
+                        decimal.TryParse(x.Available, out var available);
+                        decimal.TryParse(x.Frozen, out var frozen);
+                        decimal.TryParse(x.LockedAmount, out var lockedAmount);
+                        decimal.TryParse(x.Pending, out var pending);
+                        decimal.TryParse(x.Staked, out var staked);
+                        decimal.TryParse(x.Total, out var total);
+
+                        return new MyJetWallet.Fireblocks.Domain.Models.VaultAssets.VaultAsset()
+                        {
+                            Id = x.Id,
+                            Available = available,
+                            BlockHash = x.BlockHash,
+                            BlockHeight = x.BlockHeight,
+                            Frozen = frozen,
+                            LockedAmount = lockedAmount,
+                            Pending = pending,
+                            Staked = staked,
+                            Total = total
+                        };
+                    }).ToArray()
+                }).ToArray();
+
+                foreach (var item in Batch(vaultAccounts, batchSize))
+                {
+                    _logger.LogInformation("Streaming batch: {context}", new
+                    {
+                        Request = context,
+                        Batch = item.ToJson()
+                    });
+
+                    yield return new GetVaultAccountBalancesResponse
+                    {
+                        VaultAccounts = item,
+                    };
+                }
+            }
+            else
+            {
+                yield return new GetVaultAccountBalancesResponse()
+                {
+                    Error = new Grpc.Models.Common.ErrorResponse
+                    {
+                        ErrorCode = Grpc.Models.Common.ErrorCode.DoesNotExist,
+                    }
+                };
+            }
+        }
+
+        private static IEnumerable<T[]> Batch<T>(
+        IEnumerable<T> source, int size)
+        {
+            T[] bucket = null;
+            var count = 0;
+
+            foreach (var item in source)
+            {
+                if (bucket == null)
+                    bucket = new T[size];
+
+                bucket[count++] = item;
+
+                if (count != size)
+                    continue;
+
+                yield return bucket;
+
+                bucket = null;
+                count = 0;
+            }
+
+            // Return the last bucket with all remaining elements
+            if (bucket != null && count > 0)
+            {
+                Array.Resize(ref bucket, count);
+                yield return bucket;
             }
         }
     }
