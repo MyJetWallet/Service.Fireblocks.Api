@@ -392,6 +392,11 @@ namespace Service.Fireblocks.Api.Services
                     namePrefix: request.NamePrefix,
                     minAmountThreshold: request.Threshold.ToString(),
                     assetId: request.FireblocksAssetId);
+                _logger.LogInformation("GetBalancesForAssetAsync {context}", new
+                {
+                    Request = context,
+                    Response = response.ToJson()
+                });
             }
             catch (Exception e)
             {
