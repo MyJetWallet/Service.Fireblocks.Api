@@ -13,6 +13,8 @@ namespace Service.Fireblocks.Api.Client
 
         public IVaultAccountService GetVaultAccountService() => CreateGrpcService<IVaultAccountService>();
 
+        public IGasStationService GetGasStationService() => CreateGrpcService<IGasStationService>();
+
         public IEncryptionService GetEncryptionService() => CreateGrpcService<IEncryptionService>();
     }
 }

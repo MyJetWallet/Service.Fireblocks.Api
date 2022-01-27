@@ -12,6 +12,7 @@ namespace Service.Fireblocks.Api.Client
             var factory = new FireblocksApiClientFactory(grpcServiceUrl);
 
             builder.RegisterInstance(factory.GetVaultAccountService()).As<IVaultAccountService>().SingleInstance();
+            builder.RegisterInstance(factory.GetGasStationService()).As<IGasStationService>().SingleInstance();
         }
     }
 }
