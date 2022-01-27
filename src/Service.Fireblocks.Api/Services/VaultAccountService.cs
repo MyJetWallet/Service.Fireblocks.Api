@@ -410,7 +410,7 @@ namespace Service.Fireblocks.Api.Services
                 {
                     Error = new Grpc.Models.Common.ErrorResponse
                     {
-                        ErrorCode = Grpc.Models.Common.ErrorCode.DoesNotExist,
+                        ErrorCode = Grpc.Models.Common.ErrorCode.Unknown,
                     }
                 };
             }
