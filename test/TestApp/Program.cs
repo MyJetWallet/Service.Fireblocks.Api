@@ -18,6 +18,7 @@ namespace TestApp
 
             var factory = new FireblocksApiClientFactory("http://localhost:5001");
             var client = factory.GetVaultAccountService();
+            var assetsClient = factory.GetSupportedAssetServiceService();
             //var encryption = factory.GetEncryptionService();
 
             //var publicKey = await File.ReadAllTextAsync(@"C:\Users\O1\Desktop\fireblocks\fireblocks_api_key");
@@ -29,6 +30,18 @@ namespace TestApp
             //    PrivateKey = privateKey 
             //});
 
+            var streamAssets = assetsClient.GetSupportedAssetsAsync(new()
+            {
+                BatchSize = 30
+            });
+
+            var count = 0;
+            await foreach (var item in streamAssets)
+            {
+                Console.WriteLine(count);
+                Console.WriteLine(item?.ToJson());
+                count++;
+            }
 
             var stream = client.GetBalancesForAssetAsync(new()
             {
@@ -38,7 +51,7 @@ namespace TestApp
                 BatchSize = 1
             });
 
-            var count = 0;
+            count = 0;
             await foreach (var item in stream)
             {
                 Console.WriteLine(count);

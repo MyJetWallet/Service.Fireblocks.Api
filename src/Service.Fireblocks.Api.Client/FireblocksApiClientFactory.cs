@@ -15,6 +15,8 @@ namespace Service.Fireblocks.Api.Client
 
         public IGasStationService GetGasStationService() => CreateGrpcService<IGasStationService>();
 
+        public ISupportedAssetService GetSupportedAssetServiceService() => CreateGrpcService<ISupportedAssetService>();
+
         public IEncryptionService GetEncryptionService() => CreateGrpcService<IEncryptionService>();
     }
 }

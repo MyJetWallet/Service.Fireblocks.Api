@@ -13,6 +13,7 @@ namespace Service.Fireblocks.Api.Client
 
             builder.RegisterInstance(factory.GetVaultAccountService()).As<IVaultAccountService>().SingleInstance();
             builder.RegisterInstance(factory.GetGasStationService()).As<IGasStationService>().SingleInstance();
+            builder.RegisterInstance(factory.GetSupportedAssetServiceService()).As<ISupportedAssetService>().SingleInstance();
         }
     }
 }
