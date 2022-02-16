@@ -4,6 +4,7 @@
     {
         Unknown,
         AlreadyExist,
-        DoesNotExist
+        DoesNotExist,
+        ApiIsNotAvailable,
     }
 }

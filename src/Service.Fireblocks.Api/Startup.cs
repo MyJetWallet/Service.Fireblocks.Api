@@ -50,6 +50,7 @@ namespace Service.Fireblocks.Api
                 endpoints.MapGrpcSchema<EncryptionService, IEncryptionService>();
                 endpoints.MapGrpcSchema<GasStationService, IGasStationService>();
                 endpoints.MapGrpcSchema<SupportedAssetService, ISupportedAssetService>();
+                endpoints.MapGrpcSchema<TransactionHistoryService, ITransactionHistoryService>();
 
                 endpoints.MapGrpcSchemaRegistry();
 

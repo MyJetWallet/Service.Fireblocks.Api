@@ -1,6 +1,6 @@
 ﻿using System.ServiceModel;
 using System.Threading.Tasks;
-using Service.Fireblocks.Api.Grpc.Models.VaultAccounts;
+using Service.Fireblocks.Api.Grpc.Models.TransactionHistory;
 
 namespace Service.Fireblocks.Api.Grpc
 {
@@ -8,6 +8,6 @@ namespace Service.Fireblocks.Api.Grpc
     public interface ITransactionHistoryService
     {
         [OperationContract]
-        Task<GetVaultAccountResponse> GetVaultAccountAsync(GetVaultAccountRequest request);
+        Task<GetTransactionHistoryResponse> GetTransactionHistoryAsync(GetTransactionHistoryRequest request);
     }
 }

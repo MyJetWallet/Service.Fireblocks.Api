@@ -18,5 +18,7 @@ namespace Service.Fireblocks.Api.Client
         public ISupportedAssetService GetSupportedAssetServiceService() => CreateGrpcService<ISupportedAssetService>();
 
         public IEncryptionService GetEncryptionService() => CreateGrpcService<IEncryptionService>();
+
+        public ITransactionHistoryService GetTransactionHistoryService() => CreateGrpcService<ITransactionHistoryService>();
     }
 }
