@@ -1,7 +1,10 @@
 ﻿using Microsoft.Extensions.Logging;
 using MyJetWallet.Fireblocks.Client;
+using MyJetWallet.Fireblocks.Domain.Models.AssetMappngs;
 using MyJetWallet.Fireblocks.Domain.Models.TransactionHistories;
 using MyJetWallet.Sdk.Service;
+using MyNoSqlServer.Abstractions;
+using Service.Blockchain.Wallets.MyNoSql.AssetsMappings;
 using Service.Fireblocks.Api.Grpc;
 using Service.Fireblocks.Api.Grpc.Models.TransactionHistory;
 using System;
@@ -14,17 +17,25 @@ namespace Service.Fireblocks.Api.Services
     {
         private readonly IClient _client;
         private readonly ILogger<TransactionHistoryService> _logger;
+        private readonly IMyNoSqlServerDataReader<AssetMappingNoSql> _myNoSqlServerDataReader;
 
-        public TransactionHistoryService(IClient client, ILogger<TransactionHistoryService> logger)
+        public TransactionHistoryService(
+            IClient client, 
+            ILogger<TransactionHistoryService> logger,
+            IMyNoSqlServerDataReader<AssetMappingNoSql> myNoSqlServerDataReader)
         {
             _client = client;
             _logger = logger;
+            _myNoSqlServerDataReader = myNoSqlServerDataReader;
         }
 
         public async Task<GetTransactionHistoryResponse> GetTransactionHistoryAsync(GetTransactionHistoryRequest request)
         {
             try
             {
+                var assetsDict = _myNoSqlServerDataReader.Get()
+                    .Select(x => x.AssetMapping)
+                    .ToDictionary(x => x.FireblocksAssetId);
                 var take = request.Take > 0 && request.Take <= 500 ? request.Take : 200;
 
                 var transactions = await _client.TransactionsGetAsync(
@@ -42,12 +53,17 @@ namespace Service.Fireblocks.Api.Services
                             {
                                 var sourceType = GetTransferPeerType(x.Source.Type);
                                 var destinationType = GetTransferPeerType(x.Destination.Type);
+                                AssetMapping asset = null;
+                                AssetMapping feeAsset = null;
+
+                                assetsDict.TryGetValue(x.AssetId, out asset);
+                                assetsDict.TryGetValue(x.FeeCurrency, out feeAsset);
 
                                 return new TransactionHistory
                                 {
                                     Id = x.Id,
                                     Amount = x.Amount,
-                                    AssetId = x.AssetId,
+                                    FireblocksAssetId = x.AssetId,
                                     CreatedDateUnix = x.CreatedAt,
                                     UpdatedDateUnix = x.LastUpdated,
                                     Destination = new MyJetWallet.Fireblocks.Domain.Models.TransactionHistories.TransferPeerPath
@@ -58,7 +74,7 @@ namespace Service.Fireblocks.Api.Services
                                     },
                                     DestinationAddress = x.DestinationAddress,
                                     Fee = x.NetworkFee,
-                                    FeeAssetId = x.FeeCurrency,
+                                    FireblocksFeeAssetId = x.FeeCurrency,
                                     Source = new MyJetWallet.Fireblocks.Domain.Models.TransactionHistories.TransferPeerPath
                                     {
                                         Id = x.Source.Id,
@@ -67,7 +83,11 @@ namespace Service.Fireblocks.Api.Services
                                     },
                                     SourceAddress = x.SourceAddress,
                                     Status = TransactionHistoryStatus.COMPLETED,
-                                    TxHash = x.TxHash
+                                    TxHash = x.TxHash,
+                                    AssetNetwork = asset?.NetworkId,
+                                    AssetSymbol = asset?.AssetId,
+                                    FeeAssetNetwork = feeAsset?.AssetId,
+                                    FeeAssetSymbol = feeAsset?.NetworkId,
                                 };
                             }).ToArray(),
                         };

@@ -19,5 +19,8 @@ namespace Service.Fireblocks.Api.Settings
 
         [YamlProperty("FireblocksApi.MyNoSqlWriterUrl")]
         public string MyNoSqlWriterUrl { get; internal set; }
+
+        [YamlProperty("FireblocksApi.MyNoSqlReaderHostPort")]
+        public string MyNoSqlReaderHostPort { get; internal set; }
     }
 }

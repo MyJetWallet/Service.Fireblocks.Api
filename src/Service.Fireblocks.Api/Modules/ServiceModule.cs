@@ -8,6 +8,7 @@ using MyJetWallet.Sdk.NoSql;
 using Service.Fireblocks.Api.NoSql;
 using MyJetWallet.Fireblocks.Client.DelegateHandlers;
 using Microsoft.Extensions.Logging;
+using Service.Blockchain.Wallets.MyNoSql.AssetsMappings;
 
 namespace Service.Fireblocks.Api.Modules
 {
@@ -15,6 +16,8 @@ namespace Service.Fireblocks.Api.Modules
     {
         protected override void Load(ContainerBuilder builder)
         {
+            var myNoSqlClient = builder.CreateNoSqlClient(Program.ReloadedSettings(e => e.MyNoSqlReaderHostPort));
+            builder.RegisterMyNoSqlReader<AssetMappingNoSql>(myNoSqlClient, AssetMappingNoSql.TableName);
             var logger = Program.LogFactory.CreateLogger<LoggerMiddleware>();
             var encryptionService = new SymmetricEncryptionService(Program.EnvSettings.GetEncryptionKey());
             builder.RegisterInstance(encryptionService);

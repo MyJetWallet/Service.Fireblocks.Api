@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using MyJetWallet.Fireblocks.Client.Auth;
+using MyJetWallet.Sdk.NoSql;
 using MyJetWallet.Sdk.Service;
 using MyNoSqlServer.Abstractions;
 using Service.Fireblocks.Api.NoSql;
@@ -14,19 +15,22 @@ namespace Service.Fireblocks.Api
         private readonly IMyNoSqlServerDataWriter<FireblocksApiKeysNoSql> _myNoSqlServerData;
         private readonly KeyActivator _keyActivator;
         private readonly SymmetricEncryptionService _symmetricEncryptionService;
+        private readonly MyNoSqlClientLifeTime _noSqlTcpClient;
 
         public ApplicationLifetimeManager(
             IHostApplicationLifetime appLifetime, 
             ILogger<ApplicationLifetimeManager> logger,
             IMyNoSqlServerDataWriter<FireblocksApiKeysNoSql> myNoSqlServerData,
             KeyActivator keyActivator,
-            SymmetricEncryptionService symmetricEncryptionService)
+            SymmetricEncryptionService symmetricEncryptionService,
+            MyNoSqlClientLifeTime noSqlTcpClient)
             : base(appLifetime)
         {
             _logger = logger;
-            this._myNoSqlServerData = myNoSqlServerData;
-            this._keyActivator = keyActivator;
-            this._symmetricEncryptionService = symmetricEncryptionService;
+            _myNoSqlServerData = myNoSqlServerData;
+            _keyActivator = keyActivator;
+            _symmetricEncryptionService = symmetricEncryptionService;
+            _noSqlTcpClient = noSqlTcpClient;
         }
 
         protected override void OnStarted()
@@ -47,11 +51,14 @@ namespace Service.Fireblocks.Api
                     _logger.LogError(e, "PLS< SET UP KEYS FOR API");
                 }
             }
+
+            _noSqlTcpClient.Start();
         }
 
         protected override void OnStopping()
         {
             _logger.LogInformation("OnStopping has been called.");
+            _noSqlTcpClient.Stop();
         }
 
         protected override void OnStopped()

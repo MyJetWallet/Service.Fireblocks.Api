@@ -1,7 +1,9 @@
-﻿using MyJetWallet.Sdk.Service;
+﻿using MyJetWallet.Fireblocks.Domain.Models.TransactionHistories;
+using MyJetWallet.Sdk.Service;
 using ProtoBuf.Grpc.Client;
 using Service.Fireblocks.Api.Client;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -22,14 +24,15 @@ namespace TestApp
             var assetsClient = factory.GetSupportedAssetServiceService();
             var transactionHistoryClient = factory.GetTransactionHistoryService();
             var currentUnixTime = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
-
+            var transactionList = new List<TransactionHistory>();
+            var transactionHashes = new HashSet<string>();
             do
             {
                 var transactions = await transactionHistoryClient.GetTransactionHistoryAsync(
                     new Service.Fireblocks.Api.Grpc.Models.TransactionHistory.GetTransactionHistoryRequest()
                     {
                         BeforeUnixTime = currentUnixTime,
-                        Take = 200
+                        Take = 20
                     });
 
                 if (transactions.Error != null)
@@ -38,10 +41,35 @@ namespace TestApp
                 if (transactions.History == null || !transactions.History.Any())
                     break;
 
-                currentUnixTime = transactions.History.Last().CreatedDateUnix - 1;
+                var count = 0;
+                foreach (var item in transactions.History)
+                {
+                    if (transactionHashes.Contains(item.TxHash))
+                        continue;
 
-                Console.WriteLine(Newtonsoft.Json.JsonConvert.SerializeObject(transactions));
+                    // WITHDRAWALS, SETTLEMENTS and ALL INTERNAL TRANSFERS EXCEPT GAS STATION TRANSACTIONS
+                    // TRANSACTIONS FROM GAS STATION CURRENTLY HAVE UNKNWON TYPE
+                    if (item.Source != null && item.Source.Type == TransferPeerPathType.VAULT_ACCOUNT)
+                    {
+                        transactionHashes.Add(item.TxHash);
+                        transactionList.Add(item);
+                        count++;
+                    } else
+                    {
+                        Console.WriteLine(Newtonsoft.Json.JsonConvert.SerializeObject(item));
+                    }
+                }
+
+                if (count == 0)
+                    break;
+
+                currentUnixTime = transactions.History.Last().CreatedDateUnix;
             } while (currentUnixTime != long.MaxValue);
+
+            Console.WriteLine();
+            Console.WriteLine();
+
+            Console.WriteLine(Newtonsoft.Json.JsonConvert.SerializeObject(transactionList));
 
             //var encryption = factory.GetEncryptionService();
 
