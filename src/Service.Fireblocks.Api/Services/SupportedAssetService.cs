@@ -74,8 +74,9 @@ namespace Service.Fireblocks.Api.Services
                         AssetTypeResponseType.BEP20 => AssetType.BEP20,
                         AssetTypeResponseType.COMPOUND => AssetType.COMPOUND,
                         AssetTypeResponseType.XLM_ASSET => AssetType.XLM_ASSET,
-
-                        _ => throw new ArgumentOutOfRangeException(nameof(x.Type), x.Type, null),
+                        AssetTypeResponseType.ALGO_ASSET => AssetType.ALGO_ASSET,
+                        AssetTypeResponseType.SOL_ASSET => AssetType.SOL_ASSET,
+                        _ => AssetType.UNKNOWN,
                     }
 
                 }).ToArray();

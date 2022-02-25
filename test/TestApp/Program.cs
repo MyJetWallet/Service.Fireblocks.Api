@@ -24,52 +24,52 @@ namespace TestApp
             var assetsClient = factory.GetSupportedAssetServiceService();
             var transactionHistoryClient = factory.GetTransactionHistoryService();
             var currentUnixTime = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
-            var transactionList = new List<TransactionHistory>();
-            var transactionHashes = new HashSet<string>();
-            do
-            {
-                var transactions = await transactionHistoryClient.GetTransactionHistoryAsync(
-                    new Service.Fireblocks.Api.Grpc.Models.TransactionHistory.GetTransactionHistoryRequest()
-                    {
-                        BeforeUnixTime = currentUnixTime,
-                        Take = 20
-                    });
+            //var transactionList = new List<TransactionHistory>();
+            //var transactionHashes = new HashSet<string>();
+            //do
+            //{
+            //    var transactions = await transactionHistoryClient.GetTransactionHistoryAsync(
+            //        new Service.Fireblocks.Api.Grpc.Models.TransactionHistory.GetTransactionHistoryRequest()
+            //        {
+            //            BeforeUnixTime = currentUnixTime,
+            //            Take = 20
+            //        });
 
-                if (transactions.Error != null)
-                    break;
+            //    if (transactions.Error != null)
+            //        break;
 
-                if (transactions.History == null || !transactions.History.Any())
-                    break;
+            //    if (transactions.History == null || !transactions.History.Any())
+            //        break;
 
-                var count = 0;
-                foreach (var item in transactions.History)
-                {
-                    if (transactionHashes.Contains(item.TxHash))
-                        continue;
+            //    var count = 0;
+            //    foreach (var item in transactions.History)
+            //    {
+            //        if (transactionHashes.Contains(item.TxHash))
+            //            continue;
 
-                    // WITHDRAWALS, SETTLEMENTS and ALL INTERNAL TRANSFERS EXCEPT GAS STATION TRANSACTIONS
-                    // TRANSACTIONS FROM GAS STATION CURRENTLY HAVE UNKNWON TYPE
-                    if (item.Source != null && item.Source.Type == TransferPeerPathType.VAULT_ACCOUNT)
-                    {
-                        transactionHashes.Add(item.TxHash);
-                        transactionList.Add(item);
-                        count++;
-                    } else
-                    {
-                        Console.WriteLine(Newtonsoft.Json.JsonConvert.SerializeObject(item));
-                    }
-                }
+            //        // WITHDRAWALS, SETTLEMENTS and ALL INTERNAL TRANSFERS EXCEPT GAS STATION TRANSACTIONS
+            //        // TRANSACTIONS FROM GAS STATION CURRENTLY HAVE UNKNWON TYPE
+            //        if (item.Source != null && item.Source.Type == TransferPeerPathType.VAULT_ACCOUNT)
+            //        {
+            //            transactionHashes.Add(item.TxHash);
+            //            transactionList.Add(item);
+            //            count++;
+            //        } else
+            //        {
+            //            Console.WriteLine(Newtonsoft.Json.JsonConvert.SerializeObject(item));
+            //        }
+            //    }
 
-                if (count == 0)
-                    break;
+            //    if (count == 0)
+            //        break;
 
-                currentUnixTime = transactions.History.Last().CreatedDateUnix;
-            } while (currentUnixTime != long.MaxValue);
+            //    currentUnixTime = transactions.History.Last().CreatedDateUnix;
+            //} while (currentUnixTime != long.MaxValue);
 
-            Console.WriteLine();
-            Console.WriteLine();
+            //Console.WriteLine();
+            //Console.WriteLine();
 
-            Console.WriteLine(Newtonsoft.Json.JsonConvert.SerializeObject(transactionList));
+            //Console.WriteLine(Newtonsoft.Json.JsonConvert.SerializeObject(transactionList));
 
             //var encryption = factory.GetEncryptionService();
 
@@ -82,18 +82,18 @@ namespace TestApp
             //    PrivateKey = privateKey 
             //});
 
-            //var streamAssets = assetsClient.GetSupportedAssetsAsync(new()
-            //{
-            //    BatchSize = 30
-            //});
+            var streamAssets = assetsClient.GetSupportedAssetsAsync(new()
+            {
+                BatchSize = 30
+            });
 
-            //var count = 0;
-            //await foreach (var item in streamAssets)
-            //{
-            //    Console.WriteLine(count);
-            //    Console.WriteLine(item?.ToJson());
-            //    count++;
-            //}
+            var count = 0;
+            await foreach (var item in streamAssets)
+            {
+                Console.WriteLine(count);
+                Console.WriteLine(item?.ToJson());
+                count++;
+            }
 
             //var stream = client.GetBalancesForAssetAsync(new()
             //{
