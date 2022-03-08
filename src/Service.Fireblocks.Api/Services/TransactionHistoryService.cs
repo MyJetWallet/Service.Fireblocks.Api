@@ -68,8 +68,8 @@ namespace Service.Fireblocks.Api.Services
                                     UpdatedDateUnix = x.LastUpdated,
                                     Destination = new MyJetWallet.Fireblocks.Domain.Models.TransactionHistories.TransferPeerPath
                                     {
-                                        Id = x.Source.Id,
-                                        Name = x.Source.Name,
+                                        Id = x.Destination.Id,
+                                        Name = x.Destination.Name,
                                         Type = destinationType,
                                     },
                                     DestinationAddress = x.DestinationAddress,
