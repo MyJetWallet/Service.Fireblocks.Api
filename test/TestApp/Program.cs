@@ -90,12 +90,12 @@ namespace TestApp
             });
 
             //var count = 0;
-            await foreach (var item in streamAssets)
-            {
-                Console.WriteLine(count);
-                Console.WriteLine(item?.ToJson());
-                count++;
-            }
+            // await foreach (var item in streamAssets)
+            // {
+            //     Console.WriteLine(count);
+            //     Console.WriteLine(item?.ToJson());
+            //     count++;
+            // }
 
             //var stream = client.GetBalancesForAssetAsync(new()
             //{
