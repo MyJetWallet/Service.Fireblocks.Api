@@ -76,6 +76,7 @@ namespace Service.Fireblocks.Api.Services
                         AssetTypeResponseType.XLM_ASSET => AssetType.XLM_ASSET,
                         AssetTypeResponseType.ALGO_ASSET => AssetType.ALGO_ASSET,
                         AssetTypeResponseType.SOL_ASSET => AssetType.SOL_ASSET,
+
                         _ => AssetType.UNKNOWN,
                     }
 
