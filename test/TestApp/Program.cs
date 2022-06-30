@@ -1,7 +1,11 @@
-﻿using MyJetWallet.Fireblocks.Domain.Models.TransactionHistories;
+﻿using MyJetWallet.Fireblocks.Domain.Models.Addresses;
+using MyJetWallet.Fireblocks.Domain.Models.TransactionHistories;
 using MyJetWallet.Sdk.Service;
 using ProtoBuf.Grpc.Client;
 using Service.Fireblocks.Api.Client;
+using Service.Fireblocks.Api.Grpc.Models.Addresses;
+using Service.Fireblocks.Api.Grpc.Models.VaultAccounts;
+using Service.Fireblocks.Api.Grpc.Models.VaultAssets;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,54 +23,100 @@ namespace TestApp
             Console.ReadLine();
 
 
-            var factory = new FireblocksApiClientFactory("http://localhost:5001");
-            var client = factory.GetVaultAccountService();
+            var factory = new FireblocksApiClientFactory("http://fireblocks-api.spot-services.svc.cluster.local:80");//new FireblocksApiClientFactory("http://localhost:5001");
+            var vaultAccountService = factory.GetVaultAccountService();
             var assetsClient = factory.GetSupportedAssetServiceService();
             var transactionHistoryClient = factory.GetTransactionHistoryService();
-            var currentUnixTime = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
-            var transactionList = new List<TransactionHistory>();
-            var transactionHashes = new HashSet<string>();
-            do
+
+            var createVaultRequest = new CreateVaultAccountRequest()
             {
-                var transactions = await transactionHistoryClient.GetTransactionHistoryAsync(
-                    new Service.Fireblocks.Api.Grpc.Models.TransactionHistory.GetTransactionHistoryRequest()
-                    {
-                        BeforeUnixTime = currentUnixTime,
-                        Take = 20
-                    });
+                AutoFuel = true,
+                Name = "aave_test",
+                CustomerRefId = "aave_test",
+                //We can hide it on ui of fireblocks
+                HiddenOnUI = false
+            };
 
-                if (transactions.Error != null)
-                    break;
+            var vault = await vaultAccountService.CreateVaultAccountAsync(createVaultRequest);
 
-                if (transactions.History == null || !transactions.History.Any())
-                    break;
+            if (vault.Error != null)
+            {
+                Console.WriteLine(vault.Error.ToJson());
+            }
 
-                var count = 0;
-                foreach (var item in transactions.History)
+            VaultAddress vaultAddress = null;
+
+           CreateVaultAssetRequest request = new()
+            {
+                AsssetId = "AAVE",
+                VaultAccountId = vault.VaultAccount.Id,
+            };
+
+            var vaultAsset = await vaultAccountService.CreateVaultAssetAsync(request);
+
+            vaultAddress = vaultAsset.VaultAddress;
+
+            if (vaultAddress == null)
+            {
+                GetVaultAddressRequest request1 = new()
                 {
-                    if (transactionHashes.Contains(item.TxHash))
-                        continue;
+                    AssetId = "AAVE",
+                    VaultAccountId = vault.VaultAccount.Id,
+                };
 
-                    // WITHDRAWALS, SETTLEMENTS and ALL INTERNAL TRANSFERS EXCEPT GAS STATION TRANSACTIONS
-                    // TRANSACTIONS FROM GAS STATION CURRENTLY HAVE UNKNWON TYPE
-                    if (item.Source != null && (item.Source.Type == TransferPeerPathType.VAULT_ACCOUNT ||
-                                                item.Source.Type == TransferPeerPathType.GAS_STATION))
-                    {
-                        transactionHashes.Add(item.TxHash);
-                        transactionList.Add(item);
-                        count++;
-                    }
-                    else
-                    {
-                        Console.WriteLine(Newtonsoft.Json.JsonConvert.SerializeObject(item));
-                    }
-                }
+                var existing = await vaultAccountService.GetVaultAddressAsync(request1);
 
-                if (count == 0)
-                    break;
+                vaultAddress = existing?.VaultAddress?.FirstOrDefault();
+            }
 
-                currentUnixTime = transactions.History.Last().CreatedDateUnix;
-            } while (currentUnixTime != long.MaxValue);
+            if (vaultAddress == null)
+            {
+            }
+
+            //var currentUnixTime = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+            //var transactionList = new List<TransactionHistory>();
+            //var transactionHashes = new HashSet<string>();
+            //do
+            //{
+            //    var transactions = await transactionHistoryClient.GetTransactionHistoryAsync(
+            //        new Service.Fireblocks.Api.Grpc.Models.TransactionHistory.GetTransactionHistoryRequest()
+            //        {
+            //            BeforeUnixTime = currentUnixTime,
+            //            Take = 20
+            //        });
+
+            //    if (transactions.Error != null)
+            //        break;
+
+            //    if (transactions.History == null || !transactions.History.Any())
+            //        break;
+
+            //    var count = 0;
+            //    foreach (var item in transactions.History)
+            //    {
+            //        if (transactionHashes.Contains(item.TxHash))
+            //            continue;
+
+            //        // WITHDRAWALS, SETTLEMENTS and ALL INTERNAL TRANSFERS EXCEPT GAS STATION TRANSACTIONS
+            //        // TRANSACTIONS FROM GAS STATION CURRENTLY HAVE UNKNWON TYPE
+            //        if (item.Source != null && (item.Source.Type == TransferPeerPathType.VAULT_ACCOUNT ||
+            //                                    item.Source.Type == TransferPeerPathType.GAS_STATION))
+            //        {
+            //            transactionHashes.Add(item.TxHash);
+            //            transactionList.Add(item);
+            //            count++;
+            //        }
+            //        else
+            //        {
+            //            Console.WriteLine(Newtonsoft.Json.JsonConvert.SerializeObject(item));
+            //        }
+            //    }
+
+            //    if (count == 0)
+            //        break;
+
+            //    currentUnixTime = transactions.History.Last().CreatedDateUnix;
+            //} while (currentUnixTime != long.MaxValue);
 
             //Console.WriteLine();
             //Console.WriteLine();
@@ -84,10 +134,10 @@ namespace TestApp
             //    PrivateKey = privateKey 
             //});
 
-            var streamAssets = assetsClient.GetSupportedAssetsAsync(new()
-            {
-                BatchSize = 30
-            });
+            //var streamAssets = assetsClient.GetSupportedAssetsAsync(new()
+            //{
+            //    BatchSize = 30
+            //});
 
             //var count = 0;
             // await foreach (var item in streamAssets)
