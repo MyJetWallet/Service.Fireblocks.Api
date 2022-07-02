@@ -8,6 +8,7 @@ using Service.Fireblocks.Api.Grpc.Models.VaultAccounts;
 using Service.Fireblocks.Api.Grpc.Models.VaultAssets;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -23,10 +24,52 @@ namespace TestApp
             Console.ReadLine();
 
 
-            var factory = new FireblocksApiClientFactory("http://fireblocks-api.spot-services.svc.cluster.local:80");//new FireblocksApiClientFactory("http://localhost:5001");
+            var factory = new FireblocksApiClientFactory("http://localhost:5001");
             var vaultAccountService = factory.GetVaultAccountService();
             var assetsClient = factory.GetSupportedAssetServiceService();
             var transactionHistoryClient = factory.GetTransactionHistoryService();
+            var gasStation = factory.GetGasStationService();
+
+            var encryption = factory.GetEncryptionService();
+
+            //var publicKey = await File.ReadAllTextAsync(@"C:\Git\fireblocks-uat\fireblocks_api_key");
+            //var privateKey = await File.ReadAllTextAsync(@"C:\Git\fireblocks-uat\fireblocks_secret.key");
+            //var publicKey = await File.ReadAllTextAsync(@"C:\Users\O1\Desktop\fireblocks\fireblocks_api_key");
+            //var privateKey = await File.ReadAllTextAsync(@"C:\Users\O1\Desktop\fireblocks\fireblocks_secret.key");
+
+            //var x = await encryption.SetApiKeysAsync(new()
+            //{
+            //    ApiKey = publicKey,
+            //    PrivateKey = privateKey
+            //});
+
+            //var securityFactory = new ApiSecurityManagerClientFactory("http://localhost:5001");//("http://192.168.70.21:80");//;
+            //var apiKeyService = securityFactory.GetApiKeyService();
+            //var apikids = await apiKeyService.GetApiKeyIdsAsync(new MyJetWallet.ApiSecurityManager.Grpc.Models.GetApiKeyIdsRequest { });
+
+            //{
+            //    var publicKey = await File.ReadAllTextAsync(@"C:\Git\fireblocks-uat\fireblocks_api_key");
+            //    var privateKey = await File.ReadAllTextAsync(@"C:\Git\fireblocks-uat\fireblocks_secret.key");
+
+            //    await apiKeyService.SetApiKeysAsync(new MyJetWallet.ApiSecurityManager.Grpc.Models.SetApiKeyRequest()
+            //    {
+            //        ApiKey = publicKey,
+            //        ApiKeyId = "fireblocks-api-key-id",
+            //        EncryptionKeyId = "encryption-key-id",
+            //        PrivateKey = privateKey,
+            //    });
+            //}
+
+            do
+            {
+                var resp = await gasStation.GetGasStationAsync(new Service.Fireblocks.Api.Grpc.Models.GasStation.GetGasStationRequest
+                {
+                    
+                });
+
+                Console.WriteLine(resp.ToJson());
+                await Task.Delay(1000);
+            } while (true);
 
             var createVaultRequest = new CreateVaultAccountRequest()
             {
@@ -123,16 +166,7 @@ namespace TestApp
 
             //Console.WriteLine(Newtonsoft.Json.JsonConvert.SerializeObject(transactionList));
 
-            //var encryption = factory.GetEncryptionService();
 
-            //var publicKey = await File.ReadAllTextAsync(@"C:\Users\O1\Desktop\fireblocks\fireblocks_api_key");
-            //var privateKey = await File.ReadAllTextAsync(@"C:\Users\O1\Desktop\fireblocks\fireblocks_secret.key");
-
-            //var x = await encryption.SetApiKeysAsync(new ()
-            //{
-            //    ApiKey = publicKey,
-            //    PrivateKey = privateKey 
-            //});
 
             //var streamAssets = assetsClient.GetSupportedAssetsAsync(new()
             //{

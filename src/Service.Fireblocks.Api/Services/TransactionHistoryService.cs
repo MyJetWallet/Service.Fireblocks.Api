@@ -111,7 +111,7 @@ namespace Service.Fireblocks.Api.Services
             }
             catch (Exception e)
             {
-                _logger.LogError(e, "Error during GetTransactionHistoryAsync", request.ToJson());
+                _logger.LogWarning(e, "Error during GetTransactionHistoryAsync", request.ToJson());
                 return new GetTransactionHistoryResponse
                 {
                     Error = new Grpc.Models.Common.ErrorResponse

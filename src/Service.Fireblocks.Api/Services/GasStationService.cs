@@ -60,7 +60,7 @@ namespace Service.Fireblocks.Api.Services
             }
             catch (Exception e)
             {
-                _logger.LogError(e, "Error GetGasStationAsync {context}", request.ToJson());
+                _logger.LogWarning(e, "Error GetGasStationAsync {context}", request.ToJson());
                 
                 return new GetGasStationResponse()
                 {
